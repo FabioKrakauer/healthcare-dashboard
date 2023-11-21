@@ -1,14 +1,12 @@
 import { Component } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { RouterOutlet } from '@angular/router';
-import { CardComponent } from './card/card.component';
+import { CardModule } from './card/card.module';
 
 @Component({
+  imports: [CardModule],
   selector: 'app-root',
-  standalone: true,
-  imports: [CommonModule, RouterOutlet, CardComponent],
   templateUrl: './app.component.html',
-  styleUrl: './app.component.scss'
+  styleUrl: './app.component.scss',
+  standalone: true,
 })
 export class AppComponent {
   title = 'healthcare';
