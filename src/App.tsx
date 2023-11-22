@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import './App.css'
-import {getDatabase, onValue, ref} from 'firebase/database'
+import {getDatabase, onValue, ref, set} from 'firebase/database'
 import { initializeApp } from 'firebase/app';
 import Card from './Card';
 
@@ -8,9 +8,11 @@ interface IFeatures {
   heartRate: string;
   oxygen: string;
   oxygenLevel: string;
+  callAttendant: boolean;
 }
 function App() {
-  const [values, setValues] = useState<IFeatures>({heartRate: "-", oxygen: "-", oxygenLevel: "-"})
+  const [values, setValues] = useState<IFeatures>({heartRate: "-", oxygen: "-", oxygenLevel: "-", callAttendant: false})
+  const [callingAttendant, setCallingAttendant] = useState(false);
   const firebaseConfig = {
     apiKey: "AIzaSyACthjuEunvWaigaarHUOeDirSYrzfKmUA",
     authDomain: "projeto-healthcare-808d1.firebaseapp.com",
@@ -24,6 +26,21 @@ function App() {
   
   const app = initializeApp(firebaseConfig);
   const db = getDatabase(app);
+
+  const callAtendant = () => {
+    const query = ref(db, "attendant");
+    set(query, {
+      callAttendant: true
+    })
+    setCallingAttendant(true)
+    setTimeout(() => {
+      set(query, {
+        callAttendant: false
+      })
+      setCallingAttendant(false)
+    }, 10 * 1000)
+    return true;
+  }
 
   useEffect(() => {
     const query = ref(db, "project");
@@ -51,17 +68,24 @@ function App() {
           featureName="Oxigenio"
           icon='fa-solid fa-viruses'
           unit=''
-          value={values.oxygen} 
+          value={values.oxygenLevel} 
           color="bg-info"
         />
         <Card
           featureName="Saturação"
           icon='fa-solid fa-hands-bubbles'
           unit='%'
-          value={values.oxygenLevel} 
+          value={values.oxygen} 
           color="bg-success"
         />
       </div>
+      {callingAttendant ? (
+        <p>Chamando atendente...</p>
+      ) : (
+        <button className='btn btn-danger' onClick={callAtendant}>Chamar atendente</button>
+        )
+      }
+      
     </div>
 )}
 
